@@ -12,9 +12,11 @@ class JobboleSpider(scrapy.Spider):
 
     def parse(self, response):
 
-        post_urls = response.css('#archive .floated-thumb .post-meta a.archive-title::attr(href)').extract()
-        for post_url in post_urls:
-            yield Request(url=parse.urljoin(response.url, post_url), callback=self.parse_detail)
+        post_nodes = response.css('#archive .floated-thumb .post-thumb a')
+        for post_node in post_nodes:
+            image_url = post_node.css('img::attr(src)').extract_first("")
+            post_url = post_node.css("::attr(href)").extract_first("")
+            yield Request(url=parse.urljoin(response.url, post_url),meta={"front_image_url": image_url}, callback=self.parse_detail)
 
         next_url = response.css('.next.page-numbers::attr("href")').extract_first('')
         if next_url:
