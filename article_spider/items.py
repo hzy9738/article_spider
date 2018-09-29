@@ -13,6 +13,15 @@ class ArticleSpiderItem(scrapy.Item):
     # name = scrapy.Field()
     pass
 
-class ArticleItem(scrapy.Item):
+class JobBoleArticleItem(scrapy.Item):
     title = scrapy.Field()
-    # create_date = scrapy.
+    create_date = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()
+    front_image_url = scrapy.Field()
+    fornt_image_path = scrapy.Field()
+    praise_nums = scrapy.Field()
+    comment_nums = scrapy.Field()
+    fav_nums = scrapy.Field()
+    tags = scrapy.Field()
+    content = scrapy.Field()
