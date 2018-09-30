@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+
 # Scrapy settings for article_spider project
 #
 # For simplicity, this file contains only settings considered important or
@@ -64,9 +65,10 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'article_spider.pipelines.ArticleSpiderPipeline': 300,
+    # 'article_spider.pipelines.JsonWithEncodingPipeline': 2,
     # 'scrapy.pipelines.images.ImagesPipeline': 1,
-    'article_spider.pipelines.ArticleImagePipeline': 1,
+    # 'article_spider.pipelines.ArticleImagePipeline': 1,
+    'article_spider.pipelines.MysqlTwistedPipeline': 1,
 
 }
 IMAGES_URLS_FIELD = 'front_image_url'
@@ -95,3 +97,8 @@ IMAGES_MIN_WIDTH = 100
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+MYSQL_HOST = "47.96.143.96"
+MYSQL_DBNAME = "jobbole_article"
+MYSQL_USER = "hzy9738"
+MYSQL_PASSWORD = "hong9738"

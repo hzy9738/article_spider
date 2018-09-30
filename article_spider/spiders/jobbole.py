@@ -5,6 +5,8 @@ from scrapy.http import Request
 from urllib import parse
 from article_spider.items import JobBoleArticleItem
 from article_spider.utils.common import get_md5
+import datetime
+from scrapy.loader import ItemLoader
 
 class JobboleSpider(scrapy.Spider):
     name = "jobbole"
@@ -31,8 +33,8 @@ class JobboleSpider(scrapy.Spider):
         # 提取文章的具体字段
 
         front_image_url = response.meta.get("front_image_url", "")
-        title = response.xpath('//*[@id="post-110287"]/div[1]/h1/text()').extract_first('')
-        create_time = response.xpath('//p[@class="entry-meta-hide-on-mobile"]/text()').extract_first(
+        title = response.css('.entry-header h1::text').extract_first("")
+        create_date = response.xpath('//p[@class="entry-meta-hide-on-mobile"]/text()').extract_first(
             '').strip().replace(
             "·", " ").strip()
         praise_nums = response.xpath('//span[contains(@class,"vote-post-up")]//h10/text()').extract_first('')
@@ -53,7 +55,11 @@ class JobboleSpider(scrapy.Spider):
         article_item['title'] = title
         article_item['url'] = response.url
         article_item['url_object_id'] = get_md5(response.url)
-        article_item['create_date'] = create_time
+        try:
+            create_date = datetime.datetime.strptime(create_date, "%Y/%m/%d").date()
+        except Exception as e:
+            create_date = datetime.datetime.now().date()
+        article_item['create_date'] = create_date
         article_item['front_image_url'] = [front_image_url]
         article_item['praise_nums'] = praise_nums
         article_item['comment_nums'] = comments_nums
@@ -61,4 +67,7 @@ class JobboleSpider(scrapy.Spider):
         article_item['tags'] = tags
         article_item['content'] = content
 
+        #item loader加载item
+        item_loader = ItemLoader(item=JobBoleArticleItem(), response=response)
+        item_loader.add_css('title',' ')
         yield article_item
