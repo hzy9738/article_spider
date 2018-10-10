@@ -12,6 +12,7 @@ from scrapy.exporters import JsonItemExporter
 from twisted.enterprise import adbapi
 from django.db import models
 
+
 class ArticleSpiderPipeline(object):
     def process_item(self, item, spider):
         return item
@@ -71,32 +72,30 @@ class MysqlTwistedPipeline(object):
     def from_settings(cls, settings):
         dpparms = dict(
             host=settings["MYSQL_HOST"],
-            db = settings["MYSQL_DBNAME"],
-            user = settings["MYSQL_USER"],
-            password = settings["MYSQL_PASSWORD"],
-            charset = 'utf8',
-            cursorclass = pymysql.cursors.DictCursor,
-            use_unicode= True
+            db=settings["MYSQL_DBNAME"],
+            user=settings["MYSQL_USER"],
+            password=settings["MYSQL_PASSWORD"],
+            charset='utf8',
+            cursorclass=pymysql.cursors.DictCursor,
+            use_unicode=True
         )
         dppool = adbapi.ConnectionPool("pymysql", **dpparms)
-        return  cls(dppool)
+        return cls(dppool)
 
     def process_item(self, item, spider):
         query = self.dbpool.runInteraction(self.do_insert, item)
         query.addErrback(self.handle_error)
 
     def handle_error(self, failure):
-        print( failure )
+        print(failure)
 
     def do_insert(self, cursor, item):
-         insert_sql = """
+        insert_sql = """
             insert into article(title, url, url_object_id, create_date, fav_nums)
             VALUES (%s, %s, %s, %s, %s)
          """
-         cursor.execute(insert_sql,
-                    (item['title'], item['url'], item['url_object_id'], item['create_date'], item['fav_nums']))
-
-
+        cursor.execute(insert_sql,
+                       (item['title'], item['url'], item['url_object_id'], item['create_date'], item['fav_nums']))
 
 
 class ArticleImagePipeline(ImagesPipeline):
