@@ -3,7 +3,7 @@ import scrapy
 import re
 from scrapy.http import Request
 from urllib import parse
-from article_spider.items import JobBoleArticleItem
+from article_spider.items import JobBoleArticleItem, ArticleItemLoader
 from article_spider.utils.common import get_md5
 import datetime
 from scrapy.loader import ItemLoader
@@ -15,7 +15,6 @@ class JobboleSpider(scrapy.Spider):
     start_urls = ['http://blog.jobbole.com/all-posts/']
 
     def parse(self, response):
-
         post_nodes = response.css('#archive .floated-thumb .post-thumb a')
         for post_node in post_nodes:
             image_url = post_node.css('img::attr(src)').extract_first("")
@@ -28,7 +27,6 @@ class JobboleSpider(scrapy.Spider):
         #     yield Request(url=parse.urljoin(response.url, next_url), callback=self.parse)
 
     def parse_detail(self, response):
-
         article_item = JobBoleArticleItem()
 
         # 提取文章的具体字段
@@ -69,7 +67,7 @@ class JobboleSpider(scrapy.Spider):
 
         front_image_url = response.meta.get("front_image_url", "")
         # item loader加载item
-        item_loader = ItemLoader(item=JobBoleArticleItem(), response=response)
+        item_loader = ArticleItemLoader(item=JobBoleArticleItem(), response=response)
         item_loader.add_css('title', '.entry-header h1::text')
         item_loader.add_value('url', response.url)
         item_loader.add_value('url_object_id', get_md5(response.url))
@@ -78,7 +76,7 @@ class JobboleSpider(scrapy.Spider):
         item_loader.add_css('praise_nums', '.vote-post-up h10::text')
         item_loader.add_css('comment_nums', 'a[href="#article-comment"] span::text')
         item_loader.add_css("fav_nums", ".bookmark-btn::text")
-        item_loader.add_css('tags', 'p.entry-meta-hide-one-mobile a::text')
+        item_loader.add_css('tags', 'p.entry-meta-hide-on-mobile a::text')
         item_loader.add_css('content', 'div.entry')
 
         article_item = item_loader.load_item()
